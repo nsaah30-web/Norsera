@@ -1,0 +1,9 @@
+<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NORSERA - الإدارة</title>
+<style>body{background:#050505;color:#eee;font-family:Tahoma;padding:20px}.w{max-width:1000px;margin:auto}input,button{padding:11px;margin:5px;background:#111;color:white;border:1px solid #555;border-radius:6px}button{background:#c99b73;color:#111}table{width:100%;border-collapse:collapse}td,th{border:1px solid #444;padding:8px}h1,h2{color:#e0b58e}</style>
+<div class="w"><a href="index.html" style="color:#e0b58e">العودة للموقع</a><h1>لوحة الإدارة</h1><form id="login"><input id="email" type="email" placeholder="البريد" required><input id="pass" type="password" placeholder="كلمة المرور" required><button>دخول</button></form><div id="panel" hidden><button onclick="load('registrations')">التسجيلات</button><button onclick="load('requests')">الطلبات</button><button onclick="logout()">خروج</button><div id="out"></div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script>
+const c=window.NORSERA_CONFIG,s=c.SUPABASE_URL.includes("YOUR-")?null:supabase.createClient(c.SUPABASE_URL,c.SUPABASE_ANON_KEY);
+login.onsubmit=async e=>{e.preventDefault();let r=await s.auth.signInWithPassword({email:email.value,password:pass.value});if(r.error)alert(r.error.message);else{login.hidden=true;panel.hidden=false}};
+async function load(t){let r=await s.from(t).select("*").order("created_at",{ascending:false});if(r.error)return out.textContent=r.error.message;if(!r.data.length)return out.textContent="لا توجد بيانات";let k=Object.keys(r.data[0]);out.innerHTML="<table><tr>"+k.map(x=>"<th>"+x+"</th>").join("")+"</tr>"+r.data.map(x=>"<tr>"+k.map(y=>"<td>"+String(x[y]??"").replaceAll("<","&lt;")+"</td>").join("")+"</tr>").join("")+"</table>"}
+async function logout(){await s.auth.signOut();location.reload()}
+</script></html>
