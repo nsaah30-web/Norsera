@@ -1,25 +1,28 @@
-import requests
+export default {
+  async fetch(request, env, ctx) {
+    const supabaseUrl = "https://yfjmvftqjpkgpxqelqbv.supabase.co/rest/v1/Norsera";
+    const supabaseKey = env.SUPABASE_ANON_KEY;
 
-# رابط جدول Norsera المباشر في Supabase
-url = "https://yfjmvftqjpkgpxqelqbv.supabase.co/rest/v1/Norsera?select=*"
+    try {
+      const response = await fetch(supabaseUrl, {
+        method: "GET",
+        headers: {
+          "apikey": supabaseKey,
+          "Authorization": `Bearer ${supabaseKey}`,
+          "Content-Type": "application/json"
+        }
+      });
 
-# مفتاح الـ Anon Key المدمج
-anon_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlmam12ZnRxanBrZ3B4cWVscWJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwOTI5MDEsImV4cCI6MjEwNjY2ODkwMX0.CFSPiNN-u3PEBvtP1Ltv8yluPD593e7DWghoEcgc8Kw"
+      const data = await response.json();
 
-headers = {
-    "apikey": anon_key,
-        "Authorization": f"Bearer {anon_key}",
-            "Content-Type": "application/json"
-            }
-
-            # إرسال الطلب لجلب البيانات
-            response = requests.get(url, headers=headers)
-
-            # طباعة النتيجة
-            if response.status_code == 200:
-                print("✨ نجح الاتصال بقاعدة بيانات Norsera بنجاح!")
-                    print("البيانات المسترجعة:")
-                        print(response.json())
-                        else:
-                            print(f"❌ حدث خطأ في الاتصال: {response.status_code}")
-                                print(response.text)
+      return new Response(JSON.stringify(data, null, 2), {
+        headers: { "Content-Type": "application/json;charset=UTF-8" }
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({ error: error.message }, null, 2), {
+        status: 500,
+        headers: { "Content-Type": "application/json;charset=UTF-8" }
+      });
+    }
+  }
+};
