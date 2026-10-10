@@ -1,0 +1,39 @@
+import requests
+
+def safe_get_json(url, params=None, headers=None):
+    """
+    Safely fetches a JSON response from an API.
+    Validates status codes and Content-Type to prevent JSON parsing errors.
+    """
+    try:
+        response = requests.get(url, params=params, headers=headers)
+        
+        # 1. Check HTTP status code
+        response.raise_for_status()
+        
+        # 2. Verify that Content-Type is actually JSON
+        content_type = response.headers.get('Content-Type', '')
+        if 'application/json' not in content_type.lower():
+            print(f"Warning: Expected JSON but received Content-Type: {content_type}")
+            # If it's HTML, we print a snippet to help debug
+            if 'text/html' in content_type.lower():
+                print("Snippet of received HTML:", response.text[:200])
+            return None
+            
+        # 3. Safely parse JSON
+        return response.json()
+        
+    except requests.exceptions.HTTPError as http_err:
+        print(f"HTTP error occurred: {http_err}")
+    except requests.exceptions.RequestException as req_err:
+        print(f"Request error occurred: {req_err}")
+    except ValueError:
+        print("Error: Failed to parse response as JSON even though Content-Type was set to JSON.")
+    return None
+
+# Example usage:
+test_url = 'https://httpbin.org/json'  # Returns valid JSON
+data = safe_get_json(test_url)
+if data:
+    print("Successfully parsed JSON:")
+    print(data)
